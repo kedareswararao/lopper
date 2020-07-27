@@ -1,0 +1,11 @@
+/dts-v1/;
+
+/ {
+        compatible = "system-device-tree-v1";
+        lops {
+                lop_0 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/amba-apu@0/interrupt-controller@f9010000:status:disabled";
+                };
+	};
+};
