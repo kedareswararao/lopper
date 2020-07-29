@@ -7,5 +7,25 @@
                         compatible = "system-device-tree-v1,lop,modify";
                         modify = "/amba-apu@0/interrupt-controller@f9010000:status:disabled";
                 };
+                lop_1 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff300000:status:disabled";
+                };
+                lop_2 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff330000:status:okay";
+                };
+                lop_3 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff331000:status:okay";
+                };
+                lop_4 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff332000:status:okay";
+                };
+                lop_5 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff333000:status:okay";
+                };
 	};
 };
