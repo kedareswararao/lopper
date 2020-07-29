@@ -35,5 +35,71 @@
                         compatible = "system-device-tree-v1,lop,modify";
                         modify = "/cpus:no-access:";
                 };
+                lop_4 {
+                        // modify to "nothing", is a remove operation
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/reserved-memory::";
+                };
+                lop_5 {
+                        // modify to "nothing", is a remove operation
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/cpus_r5::";
+                };
+                lop_6 {
+                        // modify to "nothing", is a remove operation
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/interrupt-controller@f9000000::";
+                };
+                lop_7 {
+                        // modify to "nothing", is a remove operation
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/memory@FFFC0000::";
+                };
+                lop_8 {
+                        // modify to "nothing", is a remove operation
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/tcm_bus::";
+                };
+		lop_9 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff300000::";
+                };
+		lop_10 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/dma@ffc80000:status:disabled";
+                };
+                lop_11 {
+                        // modify to "nothing", is a remove operation
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/cpu_microblaze::";
+                };
+		lop_12 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff310000::";
+                };
+		lop_13 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff320000::";
+                };
+		lop_14 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff330000::";
+                };
+		lop_15 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff331000::";
+                };
+		lop_16 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff332000::";
+                };
+		lop_17 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/ipi@ff333000::";
+                };
+		lop_18 {
+                        compatible = "system-device-tree-v1,lop,modify";
+                        modify = "/gpu@fd4b0000:status:disabled";
+                };
         };
 };
