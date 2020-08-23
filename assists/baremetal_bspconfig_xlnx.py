@@ -30,7 +30,8 @@ import yaml
 
 sys.path.append(os.path.dirname(__file__))
 from baremetalconfig_xlnx import *
-from grep import *
+from baremetallinker_xlnx import *
+from bmcmake_metadata_xlnx import to_cmakelist
 
 def is_compat( node, compat_string_to_test ):
     if re.search( "module,baremetal_bspconfig_xlnx", compat_string_to_test):
@@ -43,46 +44,24 @@ def is_compat( node, compat_string_to_test ):
 def xlnx_generate_bm_bspconfig(tgt_node, sdt, options):
     root_node = sdt.tree[tgt_node]
     root_sub_nodes = root_node.subnodes()
-    mem_nodes = []
-    #Maintain a static memory IP list this is needed inorder to capture proper ip name in the xmem_config.h file
-    xlnx_memipname = {"axi_bram": 0, "ps7_ddr": 0, "psu_ddr": 0, "psv_ddr": 0, "mig": 0, "lmb_bram": 0, "axi_noc": 0, "psu_ocm": 0,  "psv_ocm": 0, "ddr4": 0}
-    for node in root_sub_nodes:
-        try:
-            device_type = node["device_type"].value
-            if "memory" in device_type:
-                mem_nodes.append(node)
-        except:
-           pass
    
-    mem_ranges = {}
-    for node in mem_nodes:
-        na = node.parent["#address-cells"].value[0]
-        ns = node.parent["#size-cells"].value[0]
-        val = node['reg'].value
-        total_nodes = int(len(val)/(na+ns))
-        name_list = [name.replace("_", "-") for name in list(xlnx_memipname.keys())]
-        try:
-            compat = node['compatible'].value[0]
-            match = [mem for mem in name_list if mem in compat]
-            for i in range(total_nodes):
-                reg, size = scan_reg_size(node, val, i)
-                key = match[0].replace("-", "_")
-                linker_secname = key + str("_") + str(xlnx_memipname[key])
-                mem_ranges.update({linker_secname: [reg, size]})
-                xlnx_memipname[key] += 1
-        except KeyError:
-            pass
-   
-    with open('xmem_config.h', 'w') as fd:
-        fd.write("#ifndef XMEM_CONFIG_H_\n")
-        fd.write("#define XMEM_CONFIG_H_\n")
+    mem_ranges = get_memranges(tgt_node, sdt, options)
+    # Generate Memconfig cmake meta-data file.
+    with open('MemConfig.cmake', 'w') as fd:
+        mem_name_list = []
+        mem_size_list = []
         for key, value in sorted(mem_ranges.items(), key=lambda e: e[1][1], reverse=True):
             start,size = value[0], value[1]
-            fd.write("\n#define XPAR_%s_BASEADDRESS %s" % (key.upper(), hex(start)))
-            fd.write("\n#define XPAR_%s_HIGHADDRESS %s" % (key.upper(), hex(start + size)))
-        fd.write("\n\n#endif\n")
+            name = "XPAR_{}_BASEADDRESS".format(key.upper())
+            mem_name_list.append(name)
+            name = "XPAR_{}_HIGHADDRESS".format(key.upper())
+            mem_name_list.append(name)
+            mem_size_list.append(hex(start))
+            mem_size_list.append(hex(start + size))
+        fd.write("set(MEM_DEF_NAMES %s)\n" % to_cmakelist(mem_name_list))
+        fd.write("set(MEM_RANGES %s)\n" % to_cmakelist(mem_size_list))
 
-    # Machine to config struct mapping
+    # Yocto Machine to CPU compat mapping
     cpu_dict = {'cortexa53-zynqmp': 'arm,cortex-a53', 'cortexa72-versal':'arm,cortex-a72', 'cortexr5-zynqmp': 'arm,cortex-r5', 'cortexa9-zynq': 'arm,cortex-a9',
                 'microblaze-pmu': 'pmu-microblaze', 'microblaze-plm': 'pmc-microblaze', 'microblaze-psm': 'psm-microblaze'}
     nodes = sdt.tree.nodes('/cpu.*')
@@ -98,12 +77,12 @@ def xlnx_generate_bm_bspconfig(tgt_node, sdt, options):
         except KeyError:
             pass
 
-    # Get the yaml file (open each data filder yaml file and find compat match)
     tmpdir = os.getcwd()
     os.chdir(options['args'][1])
     os.chdir("../data")
     cwd = os.getcwd()
     files = os.listdir(cwd)
+    # Generate CPU specific config struct file.
     for name in files:
         os.chdir(cwd)
         if os.path.isdir(name):
