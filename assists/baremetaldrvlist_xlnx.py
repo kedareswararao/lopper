@@ -95,6 +95,8 @@ def xlnx_generate_bm_drvlist(tgt_node, sdt, options):
         else:
             driver_list.append(depdrv) 
     driver_list = list(dict.fromkeys(driver_list))
+    # common driver needs to be present always
+    driver_list.append("common")
     driver_list.sort()
     os.chdir(tmpdir)
     
