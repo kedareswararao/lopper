@@ -99,14 +99,16 @@ def xlnx_generate_bm_drvlist(tgt_node, sdt, options):
     os.chdir(tmpdir)
     
     with open('distro.conf', 'w') as fd:
-        tmp_str =  ' '.join(driver_list)
+        tmpdrv_list = [drv.replace("_", "-") for drv in driver_list]
+        tmp_str =  ' '.join(tmpdrv_list)
         tmp_str = '"{}"'.format(tmp_str)
         fd.write("DISTRO_FEATURES = %s" % tmp_str)
     with open('libxil.conf', 'w') as fd:
         for drv in driver_list:
+            drv1 = drv.replace("_", "-")
             tmp_str1 = str("${RECIPE_SYSROOT}")
-            tmp_str = tmp_str1 + "/usr/lib/lib{}.a,,{},,".format(drv, drv)
+            tmp_str = tmp_str1 + "/usr/lib/lib{}.a,,{},,".format(drv, drv1)
             tmp_str = '"{}"'.format(tmp_str)
-            fd.write("\nPACKAGECONFIG[%s] = %s" % (drv, tmp_str))
+            fd.write("\nPACKAGECONFIG[%s] = %s" % (drv1, tmp_str))
 
     return driver_list
